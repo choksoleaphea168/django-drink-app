@@ -17,3 +17,10 @@ application = get_wsgi_application()
 
 app = application
 
+if os.getenv("VERCEL") and not os.getenv("DB_NAME"):
+    try:
+        from django.core.management import call_command
+        call_command('migrate', interactive=False)
+    except Exception as e:
+        print("Auto-migration error:", e)
+

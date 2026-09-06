@@ -91,10 +91,11 @@ if os.getenv("DB_NAME"):
         }
     }
 else:
+    db_path = "/tmp/db.sqlite3" if os.getenv("VERCEL") else BASE_DIR / "db.sqlite3"
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": db_path,
         }
     }
 
