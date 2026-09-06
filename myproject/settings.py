@@ -76,26 +76,22 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 import os
 from dotenv import load_dotenv
+load_dotenv(BASE_DIR / '.env')
+load_dotenv(BASE_DIR.parent / '.env')
 
 try:
     import dj_database_url
 except ImportError:
     dj_database_url = None
 
-if os.getenv("POSTGRES_URL") and dj_database_url:
+POSTGRES_URL = os.getenv("POSTGRES_URL") or os.getenv("DATABASE_URL")
+
+if POSTGRES_URL and dj_database_url:
     DATABASES = {
         "default": dj_database_url.config(
-            default=os.getenv("POSTGRES_URL"),
+            default=POSTGRES_URL,
             conn_max_age=600,
-            ssl_require=True
-        )
-    }
-elif os.getenv("DATABASE_URL") and dj_database_url:
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=os.getenv("DATABASE_URL"),
-            conn_max_age=600,
-            ssl_require=True
+            ssl_require=not DEBUG
         )
     }
 elif os.getenv("DB_NAME"):
@@ -105,7 +101,7 @@ elif os.getenv("DB_NAME"):
             "NAME": os.getenv("DB_NAME"),
             "USER": os.getenv("DB_USER"),
             "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
             "PORT": os.getenv("DB_PORT", "5432"),
         }
     }
