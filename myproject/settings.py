@@ -82,7 +82,7 @@ try:
 except ImportError:
     dj_database_url = None
 
-if os.getenv("POSTGRES_URL"):
+if os.getenv("POSTGRES_URL") and dj_database_url:
     DATABASES = {
         "default": dj_database_url.config(
             default=os.getenv("POSTGRES_URL"),
@@ -90,7 +90,7 @@ if os.getenv("POSTGRES_URL"):
             ssl_require=True
         )
     }
-elif os.getenv("DATABASE_URL"):
+elif os.getenv("DATABASE_URL") and dj_database_url:
     DATABASES = {
         "default": dj_database_url.config(
             default=os.getenv("DATABASE_URL"),
