@@ -77,9 +77,28 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
 
-if os.getenv("DB_NAME"):
+if os.getenv("POSTGRES_URL"):
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("POSTGRES_URL"),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+elif os.getenv("DATABASE_URL"):
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+elif os.getenv("DB_NAME"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -87,7 +106,7 @@ if os.getenv("DB_NAME"):
             "USER": os.getenv("DB_USER"),
             "PASSWORD": os.getenv("DB_PASSWORD"),
             "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT"),
+            "PORT": os.getenv("DB_PORT", "5432"),
         }
     }
 else:
